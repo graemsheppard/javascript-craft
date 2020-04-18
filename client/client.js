@@ -98,7 +98,34 @@ window.onload = function () {
   }
 
   function drawBarriers () {
+    ctx.fillStyle = 'black';
+    for (let i = 0; i < barriers.length; i++) {
+      ctx.fillRect(barriers[i].x, barriers[i].y, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x - 1600, barriers[i].y, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x + 1600, barriers[i].y, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x, barriers[i].y - 1200, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x, barriers[i].y + 1200, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x - 1600, barriers[i].y - 1200, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x - 1600, barriers[i].y + 1200, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x + 1600, barriers[i].y - 1200, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x + 1600, barriers[i].y + 1200, barriers[i].w, barriers[i].h);
+    }
+  }
 
+  function drawLines(b) {
+    if (b) {
+      ctx.strokeStyle = 'lightgrey';
+      ctx.beginPath();
+      ctx.moveTo(-1600, 0);
+      ctx.lineTo(3200, 0);
+      ctx.moveTo(1600, -1200);
+      ctx.lineTo(1600, 2400);
+      ctx.moveTo(3200, 1200);
+      ctx.lineTo(-1600, 1200);
+      ctx.moveTo(0, 2400);
+      ctx.lineTo(0, -1200);
+      ctx.stroke();
+    }
   }
 
   function drawObjects () {
@@ -111,17 +138,7 @@ window.onload = function () {
 
     cvs.width += 0;
     ctx.translate(cvs.width / 2 - p.x, cvs.height / 2 - p.y);
-    ctx.strokeStyle = 'lightgrey';
-    ctx.beginPath();
-    ctx.moveTo(-1600, 0);
-    ctx.lineTo(3200, 0);
-    ctx.moveTo(1600, -1200);
-    ctx.lineTo(1600, 2400);
-    ctx.moveTo(3200, 1200);
-    ctx.lineTo(-1600, 1200);
-    ctx.moveTo(0, 2400);
-    ctx.lineTo(0, -1200);
-    ctx.stroke();
+    drawLines(false);
     for (let i = 0; i < coords.length; i++) {
       if (coords[i].id == socket.id) {
         ctx.fillStyle = 'blue';
@@ -182,7 +199,7 @@ window.onload = function () {
         }
       }
       drawGun(coords[i], 0, 0);
-
+      drawBarriers();
       //drawGun(coords[i]);
       // if (coords[i].gun) {
       //   ctx.translate(coords[i].x, coords[i].y);
@@ -222,9 +239,7 @@ window.onload = function () {
     ctx.font = '30px Arial';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.rect((cvs.width - 4 * hp) / 2, 5, 4 * hp, 10);
-    ctx.fill();
+    ctx.fillRect((cvs.width - 4 * hp) / 2, 5, 4 * hp, 10);
   }
 
 }
