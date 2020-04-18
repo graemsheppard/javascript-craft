@@ -111,7 +111,17 @@ window.onload = function () {
 
     cvs.width += 0;
     ctx.translate(cvs.width / 2 - p.x, cvs.height / 2 - p.y);
-
+    ctx.strokeStyle = 'lightgrey';
+    ctx.beginPath();
+    ctx.moveTo(-1600, 0);
+    ctx.lineTo(3200, 0);
+    ctx.moveTo(1600, -1200);
+    ctx.lineTo(1600, 2400);
+    ctx.moveTo(3200, 1200);
+    ctx.lineTo(-1600, 1200);
+    ctx.moveTo(0, 2400);
+    ctx.lineTo(0, -1200);
+    ctx.stroke();
     for (let i = 0; i < coords.length; i++) {
       if (coords[i].id == socket.id) {
         ctx.fillStyle = 'blue';
@@ -122,16 +132,80 @@ window.onload = function () {
       ctx.arc(coords[i].x, coords[i].y, coords[i].r, 0, 2 * Math.PI);
       ctx.fill();
 
-      if (coords[i].gun) {
-        ctx.translate(coords[i].x, coords[i].y);
-        ctx.rotate(coords[i].gun.theta);
+      let num = 0;
+
+      if (coords[i].x > 1600 - cvs.width / 2) {
         ctx.beginPath();
-        ctx.rect(0, -coords[i].gun.w / 2, coords[i].gun.l, coords[i].gun.w);
+        ctx.arc(coords[i].x - 1600, coords[i].y, coords[i].r, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.rotate(-coords[i].gun.theta);
-        ctx.translate(-coords[i].x, -coords[i].y);
+        drawGun(coords[i], -1600, 0);
+        num = 1;
+      } else if (coords[i].x < cvs.width / 2) {
+        ctx.beginPath();
+        ctx.arc(coords[i].x + 1600, coords[i].y, coords[i].r, 0, 2 * Math.PI);
+        ctx.fill();
+        drawGun(coords[i], 1600, 0);
+        num = 2;
       }
 
+      if (coords[i].y > 1200 - cvs.height / 2) {
+        ctx.beginPath();
+        ctx.arc(coords[i].x, coords[i].y - 1200, coords[i].r, 0, 2 * Math.PI);
+        ctx.fill();
+        drawGun(coords[i], 0, -1200);
+        if (num == 1) {
+          ctx.beginPath();
+          ctx.arc(coords[i].x - 1600, coords[i].y - 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.fill();
+          drawGun(coords[i], -1600, -1200);
+        } else if (num == 2) {
+          ctx.beginPath();
+          ctx.arc(coords[i].x + 1600, coords[i].y - 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.fill();
+          drawGun(coords[i], 1600, -1200);
+        }
+      } else if (coords[i].y < cvs.height / 2) {
+        ctx.beginPath();
+        ctx.arc(coords[i].x, coords[i].y + 1200, coords[i].r, 0, 2 * Math.PI);
+        ctx.fill();
+        drawGun(coords[i], 0, 1200);
+        if (num == 1) {
+          ctx.beginPath();
+          ctx.arc(coords[i].x - 1600, coords[i].y + 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.fill();
+          drawGun(coords[i], -1600, 1200);
+        } else if (num == 2) {
+          ctx.beginPath();
+          ctx.arc(coords[i].x + 1600, coords[i].y + 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.fill();
+          drawGun(coords[i], 1600, 1200);
+        }
+      }
+      drawGun(coords[i], 0, 0);
+
+      //drawGun(coords[i]);
+      // if (coords[i].gun) {
+      //   ctx.translate(coords[i].x, coords[i].y);
+      //   ctx.rotate(coords[i].gun.theta);
+      //   ctx.beginPath();
+      //   ctx.rect(0, -coords[i].gun.w / 2, coords[i].gun.l, coords[i].gun.w);
+      //   ctx.fill();
+      //   ctx.rotate(-coords[i].gun.theta);
+      //   ctx.translate(-coords[i].x, -coords[i].y);
+      // }
+
+    }
+  }
+
+  function drawGun (coords, offsetX, offsetY) {
+    if (coords.gun) {
+      ctx.translate(coords.x + offsetX, coords.y + offsetY);
+      ctx.rotate(coords.gun.theta);
+      ctx.beginPath();
+      ctx.rect(0, -coords.gun.w / 2, coords.gun.l, coords.gun.w);
+      ctx.fill();
+      ctx.rotate(-coords.gun.theta);
+      ctx.translate(-(coords.x + offsetX), -(coords.y + offsetY));
     }
   }
 

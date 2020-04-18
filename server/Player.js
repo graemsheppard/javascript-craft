@@ -24,10 +24,10 @@ class Player {
     if (this.m.down) { this.y += this.speed; }
     if (this.m.left) { this.x -= this.speed; }
     if (this.m.right) { this.x+= this.speed; }
-    if (this.x > 800) { this.x = 0; }
-    if (this.x < 0) { this.x = 800; }
-    if (this.y > 600) { this.y = 0; }
-    if (this.y < 0) { this.y = 600; }
+    if (this.x > 1600) { this.x = 0; }
+    if (this.x < 0) { this.x = 1600; }
+    if (this.y > 1200) { this.y = 0; }
+    if (this.y < 0) { this.y = 1200; }
   }
 
 
