@@ -1,5 +1,5 @@
 const Gun = require('./Gun');
-
+const ROOT_TWO = Math.sqrt(2);
 class Player {
 
   constructor (socket) {

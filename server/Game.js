@@ -17,7 +17,6 @@ class Game {
 
   __start() {
     this.__createBarriers();
-    this.__sendBarriers();
     this.__update();
   }
 
@@ -25,6 +24,7 @@ class Game {
     setInterval(() => {
       this.__movePlayers();
       this.__moveBullets();
+      this.__checkCollisions();
       this.__checkPlayersHit();
       this.__sendPositions();
       this.__sendHP();
@@ -34,6 +34,7 @@ class Game {
 
 
   addPlayer (player) {
+    this.__sendBarriers(player.socket.id);
     this.players.push(player);
     player.socket.on('move', (move) => {
       player.m = move;
@@ -61,17 +62,17 @@ class Game {
   }
 
   __createBarriers () {
-    let rand = Math.floor(Math.random() * 3 + 5);
+    let rand = Math.floor(Math.random() * 10 + 5);
     for (let i = 0; i < rand; i++) {
-      let rx = Math.floor(Math.random() * 750);
-      let ry = Math.floor(Math.random() * 550);
-      let rw = Math.floor(Math.random() * 200 + 50);
-      let rh = Math.floor(Math.random() * 200 + 50);
+      let rx = Math.floor(Math.random() * 1500);
+      let ry = Math.floor(Math.random() * 1100);
+      let rw = Math.floor(Math.random() * 100 + 50);
+      let rh = Math.floor(Math.random() * 100 + 50);
       this.barriers[i] = new Barrier(rx, ry, rw, rh);
     }
   }
 
-  __sendBarriers () {
+  __sendBarriers (id) {
     let barriers = [];
     for (let i = 0; i < this.barriers.length; i++) {
       let b = {
@@ -82,7 +83,7 @@ class Game {
       }
       barriers[i] = b;
     }
-    this.io.sockets.emit('barriers', barriers);
+    this.io.to(id).emit('barriers', barriers);
   }
 
   __movePlayers () {
@@ -155,6 +156,29 @@ class Game {
             p = new Player(temp1);
             p.kills = temp2;
             this.addPlayer(p);
+          }
+        }
+      }
+    }
+  }
+
+  __checkCollisions () {
+    for (let i = 0; i < this.barriers.length; i++) {
+      let bar = this.barriers[i];
+      for (let j = 0; j < this.bullets.length; j++) {
+        let bul = this.bullets[j].pos;
+        if (bul.x > bar.x && bul.x < bar.x + bar.w) {
+          if (bul.y > bar.y && bul.y < bar.y + bar.h) {
+            this.bullets.splice(j, 1);
+          }
+        }
+      }
+
+      for (let j = 0; j < this.players.length; j++) {
+        let p = this.players[j];
+        if (p.x > bar.x - p.r && p.x < bar.x + bar.w + p.r) {
+          if (p.y > bar.y - p.r && p.y < bar.y + bar.h + p.r) {
+            p.inBarrier = true;
           }
         }
       }
