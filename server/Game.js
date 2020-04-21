@@ -95,7 +95,7 @@ class Game {
   __moveBullets () {
     for (let i = 0; i < this.bullets.length; i++) {
       this.bullets[i].move();
-      if (this.bullets[0].count > 500) {
+      if (this.bullets[0].count > 300) {
         this.bullets.splice(0, 1);
       }
     }
@@ -178,39 +178,7 @@ class Game {
         let p = this.players[j];
         if (p.x > bar.x - p.r && p.x < bar.x + bar.w + p.r) {
           if (p.y > bar.y - p.r && p.y < bar.y + bar.h + p.r) {
-            let temp = Math.abs(p.x - bar.x);
-            let min = temp;
-            let c = 1;
-            temp = Math.abs(p.x - (bar.x + bar.w));
-            if (temp < min) {
-              min = temp;
-              c = 2;
-            }
-            temp = Math.abs(p.y - bar.x);
-            if (temp < min) {
-              min = temp;
-              c = 3;
-            }
-            temp = Math.abs(p.y - (bar.x + bar.h));
-            if (temp < min) {
-              min = temp;
-              c = 4;
-            }
-
-            switch (c) {
-              case 1:
-                p.x = bar.x - p.r;
-                break;
-              case 2:
-                p.x = bar.x + bar.w + p.r;
-                break;
-              case 3:
-                p.y = bar.y - p.r;
-                break;
-              case 4:
-                p.y = bar.y + bar.h + p.r;
-                break;
-            }
+            p.collision(bar);
           }
         }
       }
@@ -221,7 +189,6 @@ class Game {
     for (let i = 0; i < this.players.length; i++) {
       if (this.players[i].socket.id == id) {
         this.players[i].socket.removeAllListeners();
-        this.players[i] = null;
         this.players.splice(i, 1);
       }
     }
