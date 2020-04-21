@@ -2,7 +2,6 @@ window.onload = function () {
   cvs = document.getElementById('canvas');
   ctx = cvs.getContext('2d');
 
-
   var socket = io();
   let coords = [];
   var kills = 0;
@@ -18,6 +17,7 @@ window.onload = function () {
     right: false
   }
   let barriers = [];
+  let mapSize;
 
   window.addEventListener('keydown', (e) => {
     switch (e.code) {
@@ -72,6 +72,15 @@ window.onload = function () {
 
   }, 1000 / 60);
 
+  socket.on('viewport', (v) => {
+    cvs.width = v.w;
+    cvs.height = v.h;
+  });
+
+  socket.on('mapSize', (ms) => {
+    mapSize = ms;
+  });
+
   socket.on('positions', (c) => {
     coords = c;
   });
@@ -100,14 +109,14 @@ window.onload = function () {
     ctx.fillStyle = 'black';
     for (let i = 0; i < barriers.length; i++) {
       ctx.fillRect(barriers[i].x, barriers[i].y, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x - 1600, barriers[i].y, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x + 1600, barriers[i].y, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x, barriers[i].y - 1200, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x, barriers[i].y + 1200, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x - 1600, barriers[i].y - 1200, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x - 1600, barriers[i].y + 1200, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x + 1600, barriers[i].y - 1200, barriers[i].w, barriers[i].h);
-      ctx.fillRect(barriers[i].x + 1600, barriers[i].y + 1200, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x - mapSize.w, barriers[i].y, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x + mapSize.w, barriers[i].y, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x, barriers[i].y - mapSize.h, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x, barriers[i].y + mapSize.h, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x - mapSize.w, barriers[i].y - mapSize.h, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x - mapSize.w, barriers[i].y + mapSize.h, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x + mapSize.w, barriers[i].y - mapSize.h, barriers[i].w, barriers[i].h);
+      ctx.fillRect(barriers[i].x + mapSize.w, barriers[i].y + mapSize.h, barriers[i].w, barriers[i].h);
     }
   }
 
@@ -115,14 +124,14 @@ window.onload = function () {
     if (b) {
       ctx.strokeStyle = 'lightgrey';
       ctx.beginPath();
-      ctx.moveTo(-1600, 0);
-      ctx.lineTo(3200, 0);
-      ctx.moveTo(1600, -1200);
-      ctx.lineTo(1600, 2400);
-      ctx.moveTo(3200, 1200);
-      ctx.lineTo(-1600, 1200);
-      ctx.moveTo(0, 2400);
-      ctx.lineTo(0, -1200);
+      ctx.moveTo(-mapSize.w, 0);
+      ctx.lineTo(2 * mapSize.w, 0);
+      ctx.moveTo(mapSize.w, -mapSize.h);
+      ctx.lineTo(mapSize.w, 2 * mapSize.h);
+      ctx.moveTo(2 * mapSize.w, mapSize.h);
+      ctx.lineTo(-mapSize.w, mapSize.h);
+      ctx.moveTo(0, 2 * mapSize.h);
+      ctx.lineTo(0, -mapSize.h);
       ctx.stroke();
     }
   }
@@ -150,51 +159,51 @@ window.onload = function () {
 
       let num = 0;
 
-      if (coords[i].x > 1600 - cvs.width / 2) {
+      if (coords[i].x > mapSize.w - cvs.width / 2) {
         ctx.beginPath();
-        ctx.arc(coords[i].x - 1600, coords[i].y, coords[i].r, 0, 2 * Math.PI);
+        ctx.arc(coords[i].x - mapSize.w, coords[i].y, coords[i].r, 0, 2 * Math.PI);
         ctx.fill();
-        drawGun(coords[i], -1600, 0);
+        drawGun(coords[i], -mapSize.w, 0);
         num = 1;
       } else if (coords[i].x < cvs.width / 2) {
         ctx.beginPath();
-        ctx.arc(coords[i].x + 1600, coords[i].y, coords[i].r, 0, 2 * Math.PI);
+        ctx.arc(coords[i].x + mapSize.w, coords[i].y, coords[i].r, 0, 2 * Math.PI);
         ctx.fill();
-        drawGun(coords[i], 1600, 0);
+        drawGun(coords[i], mapSize.w, 0);
         num = 2;
       }
 
-      if (coords[i].y > 1200 - cvs.height / 2) {
+      if (coords[i].y > mapSize.h - cvs.height / 2) {
         ctx.beginPath();
-        ctx.arc(coords[i].x, coords[i].y - 1200, coords[i].r, 0, 2 * Math.PI);
+        ctx.arc(coords[i].x, coords[i].y - mapSize.h, coords[i].r, 0, 2 * Math.PI);
         ctx.fill();
-        drawGun(coords[i], 0, -1200);
+        drawGun(coords[i], 0, -mapSize.h);
         if (num == 1) {
           ctx.beginPath();
-          ctx.arc(coords[i].x - 1600, coords[i].y - 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.arc(coords[i].x - mapSize.w, coords[i].y - mapSize.h, coords[i].r, 0, 2 * Math.PI);
           ctx.fill();
-          drawGun(coords[i], -1600, -1200);
+          drawGun(coords[i], -mapSize.w, -mapSize.h);
         } else if (num == 2) {
           ctx.beginPath();
-          ctx.arc(coords[i].x + 1600, coords[i].y - 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.arc(coords[i].x + mapSize.w, coords[i].y - mapSize.h, coords[i].r, 0, 2 * Math.PI);
           ctx.fill();
-          drawGun(coords[i], 1600, -1200);
+          drawGun(coords[i], mapSize.w, -mapSize.h);
         }
       } else if (coords[i].y < cvs.height / 2) {
         ctx.beginPath();
-        ctx.arc(coords[i].x, coords[i].y + 1200, coords[i].r, 0, 2 * Math.PI);
+        ctx.arc(coords[i].x, coords[i].y + mapSize.h, coords[i].r, 0, 2 * Math.PI);
         ctx.fill();
-        drawGun(coords[i], 0, 1200);
+        drawGun(coords[i], 0, mapSize.h);
         if (num == 1) {
           ctx.beginPath();
-          ctx.arc(coords[i].x - 1600, coords[i].y + 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.arc(coords[i].x - mapSize.w, coords[i].y + mapSize.h, coords[i].r, 0, 2 * Math.PI);
           ctx.fill();
-          drawGun(coords[i], -1600, 1200);
+          drawGun(coords[i], -mapSize.w, mapSize.h);
         } else if (num == 2) {
           ctx.beginPath();
-          ctx.arc(coords[i].x + 1600, coords[i].y + 1200, coords[i].r, 0, 2 * Math.PI);
+          ctx.arc(coords[i].x + mapSize.w, coords[i].y + mapSize.h, coords[i].r, 0, 2 * Math.PI);
           ctx.fill();
-          drawGun(coords[i], 1600, 1200);
+          drawGun(coords[i], mapSize.w, mapSize.h);
         }
       }
       drawGun(coords[i], 0, 0);

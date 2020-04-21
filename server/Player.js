@@ -2,7 +2,7 @@ const Gun = require('./Gun');
 const ROOT_TWO = Math.sqrt(2);
 class Player {
 
-  constructor (socket) {
+  constructor (socket, ms) {
     this.socket = socket;
     this.speed = 5;
     this.r = 20;
@@ -17,6 +17,7 @@ class Player {
       left: false,
       right: false
     }
+    this.mapSize = ms;
   }
 
   move() {
@@ -24,10 +25,10 @@ class Player {
     if (this.m.down) { this.y += this.speed; }
     if (this.m.left) { this.x -= this.speed; }
     if (this.m.right) { this.x+= this.speed; }
-    if (this.x > 1600) { this.x = 0; }
-    if (this.x < 0) { this.x = 1600; }
-    if (this.y > 1200) { this.y = 0; }
-    if (this.y < 0) { this.y = 1200; }
+    if (this.x > this.mapSize.w) { this.x = 0; }
+    if (this.x < 0) { this.x = this.mapSize.w; }
+    if (this.y > this.mapSize.h) { this.y = 0; }
+    if (this.y < 0) { this.y = this.mapSize.h; }
   }
 
   collision (barrier) {

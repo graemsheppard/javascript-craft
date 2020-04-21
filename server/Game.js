@@ -2,6 +2,15 @@ const Vector = require('./Vector');
 const Bullet = require('./Bullet');
 const Barrier = require('./Barrier');
 const Player = require('./Player');
+const viewport = {
+  w: 1200,
+  h: 800
+};
+
+const mapSize = {
+  w: 1600,
+  h: 1200
+}
 
 class Game {
 
@@ -33,25 +42,28 @@ class Game {
 
 
 
-  addPlayer (player) {
+  addPlayer (socket) {
+    let player = new Player(socket, mapSize);
     this.__sendBarriers(player.socket.id);
+    this.io.to(player.socket.id).emit('viewport', viewport);
+    this.io.to(player.socket.id).emit('mapSize', mapSize);
     this.players.push(player);
     player.socket.on('move', (move) => {
       player.m = move;
     });
     player.socket.on('fire', (mousePos) => {
-      let midPos = new Vector(400, 300);
+      let midPos = new Vector(viewport.w / 2, viewport.h / 2);
       let mPos = new Vector(mousePos.x, mousePos.y);
       let pPos = new Vector(player.x, player.y);
       let dir = mPos.subtract(midPos);
       dir = dir.norm();
       let spread = 0.15;
       dir = dir.add(new Vector(spread * (Math.random() - 0.5), spread * (Math.random() - 0.5)));
-      let b = new Bullet (pPos.add(dir.multiply(player.gun.l)), dir, player.socket.id);
+      let b = new Bullet (pPos.add(dir.multiply(player.gun.l)), dir, player.socket.id, mapSize);
       this.bullets.push(b);
     });
     player.socket.on('mousepos', (mousePos) => {
-      let midPos = new Vector(400, 300);
+      let midPos = new Vector(viewport.w / 2, viewport.h / 2);
       let mPos = new Vector(mousePos.x, mousePos.y);
       let dir = mPos.subtract(midPos);
       let theta = Math.acos(dir.x / dir.magnitude());
@@ -64,8 +76,8 @@ class Game {
   __createBarriers () {
     let rand = Math.floor(Math.random() * 10 + 5);
     for (let i = 0; i < rand; i++) {
-      let rx = Math.floor(Math.random() * 1600);
-      let ry = Math.floor(Math.random() * 1200);
+      let rx = Math.floor(Math.random() * mapSize.w);
+      let ry = Math.floor(Math.random() * mapSize.h);
       let rw = Math.floor(Math.random() * 100 + 50);
       let rh = Math.floor(Math.random() * 100 + 50);
       this.barriers[i] = new Barrier(rx, ry, rw, rh);
@@ -153,7 +165,7 @@ class Game {
             let temp1 = p.socket;
             let temp2 = p.kills;
             this.removePlayer(p.socket.id);
-            p = new Player(temp1);
+            p = new Player(temp1, mapSize);
             p.kills = temp2;
             this.addPlayer(p);
           }

@@ -31,7 +31,7 @@ io.sockets.on('connection', (socket) => {
   if (!game) {
     game = new Game (io);
   }
-  game.addPlayer(new Player(socket));
+  game.addPlayer(socket);
 
   socket.on('disconnect', () => {
     game.removePlayer(socket.id);
