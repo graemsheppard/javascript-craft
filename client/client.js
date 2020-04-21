@@ -4,7 +4,7 @@ window.onload = function () {
 
 
   var socket = io();
-  var coords;
+  let coords = [];
   var kills = 0;
   let mousePos = {
     x: 0,
@@ -86,7 +86,6 @@ window.onload = function () {
 
   socket.on('barriers', (b) => {
     barriers = b;
-    console.log(barriers);
   });
 
   function draw () {
@@ -200,16 +199,6 @@ window.onload = function () {
       }
       drawGun(coords[i], 0, 0);
       drawBarriers();
-      //drawGun(coords[i]);
-      // if (coords[i].gun) {
-      //   ctx.translate(coords[i].x, coords[i].y);
-      //   ctx.rotate(coords[i].gun.theta);
-      //   ctx.beginPath();
-      //   ctx.rect(0, -coords[i].gun.w / 2, coords[i].gun.l, coords[i].gun.w);
-      //   ctx.fill();
-      //   ctx.rotate(-coords[i].gun.theta);
-      //   ctx.translate(-coords[i].x, -coords[i].y);
-      // }
 
     }
   }

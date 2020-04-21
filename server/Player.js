@@ -30,6 +30,30 @@ class Player {
     if (this.y < 0) { this.y = 1200; }
   }
 
+  collision (barrier) {
+    let temp = false;
+    if (this.m.left) {
+      this.x += this.speed;
+      temp = true;
+    }
+    if (this.m.down) {
+      this.y -= this.speed;
+      temp = true;
+    }
+    if (this.m.right) {
+      this.x -= this.speed;
+      temp = true;
+    }
+    if (this.m.up) {
+      this.y += this.speed;
+      temp = true;
+    }
+    if (!temp) {
+      this.y = barrier.y - this.r;
+    }
+
+  }
+
 
 
 }
